@@ -29,6 +29,7 @@ from scipy.cluster.hierarchy import fcluster
 import warnings
 warnings.filterwarnings("ignore")
 
+from evci_config import *
 from evci_model import *
 
 def run_episode(s_df,txt,OUTPUT_PATH):
@@ -70,10 +71,10 @@ def run_episode(s_df,txt,OUTPUT_PATH):
 
 def main(args):
    #@title set paths
-   INPUT_PATH = args.input_dir
-   OUTPUT_PATH = args.output_dir
-
    EXPT = args.expt
+
+   INPUT_PATH = args.input_dir + '/' + args.expt + '/'
+   OUTPUT_PATH = args.output_dir + '/' + args.expt + '/'
 
    #@title Read Master Data Excel Book
    newdata = pd.read_excel(INPUT_PATH + args.prefix + '/' + args.master_xlsx, sheet_name=None)
@@ -156,79 +157,16 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--input_dir", type=str,
+        "--input_dir", type=str, default='input',
+        help="""this is an optional argument. 'input/' assumed"""
     )
     parser.add_argument(
-        "--output_dir", type=str,
+        "--output_dir", type=str, default='output',
+        help="""this is an optional argument. 'output/' assumed"""
     )
     parser.add_argument(
         "--expt", type=str, default=None,
-        help="""Choose name of the experiment. Output files will be 
-                saved using the input provided here"""
-    )
-    parser.add_argument(
-        "--prefix", type=str, default=None,
-        help="""Choose prefix to be used for output files"""
-    )
-    parser.add_argument(
-        "--master_xlsx", type=str, default=None,
-        help="""Filename with extension of the master XLSX file"""
-    )
-    parser.add_argument(
-        "--gis", type=str, default=None,
-        help="""Filename of the shapefile folder"""
-    )
-    parser.add_argument(
-        "--choose_chargers", type=dict, default={'2W', '4WS', '4WF'},
-        help="""Choose one or more charger types"""
-    )
-    parser.add_argument(
-        "--num_years", type=int, default=3,
-        help="""Choose duration of policy for analyis (1..3)"""
-    )
-    parser.add_argument(
-        "--capex_2W", type=int, default=25000,
-        help="""Capex requirement for two-wheelers chargers"""
-    )
-    parser.add_argument(
-        "--capex_4W_slow_charging", type=int, default=100000,
-        help="""Capex requirement for four-wheelers slow chargers"""
-    )
-    parser.add_argument(
-        "--capex_4W_fast_charging", type=int, default=900000,
-        help="""Capex requirement for four-wheelers fast chargers"""
-    )
-    parser.add_argument(
-        "--hoarding_cost", type=int, default=900000,
-        help="""Capex requirement for hoarding boards"""
-    )
-    parser.add_argument(
-        "--kiosk_cost", type=int, default=180000,
-        help="""Capex requirement for kiosks"""
-    )
-    parser.add_argument(
-        "--year1_conversion", type=float, default=0.01,
-        help="""Percent conversion of vehicles into EV in year 1"""
-    )
-    parser.add_argument(
-        "--year2_conversion", type=float, default=0.03,
-        help="""Percent conversion of vehicles into EV in year 2"""
-    )
-    parser.add_argument(
-        "--year3_conversion", type=float, default=0.05,
-        help="""Percent conversion of vehicles into EV in year 3"""
-    )
-    parser.add_argument(
-        "--holiday_percentage", type=float, default=0.3,
-        help="""Percent vehicles on road during holidays/weekends"""
-    )
-    parser.add_argument(
-        "--fast_charging", type=float, default=0.08,
-        help="""Percentage of EV opting fast charging"""
-    )
-    parser.add_argument(
-        "--slow_charging", type=float, default=0.02,
-        help="""Percentage of EV opting slow charging"""
+        help="""name of the experiment for unique output file names"""
     )
     parser.add_argument(
         "--threshold_and_cluster", type=bool, default=False,
