@@ -75,7 +75,7 @@ def opex(r,s_df_distances,i):
     op_e = 0
     op_l = 0
 
-    for k in r['Gk']:
+    for k in r['years_of_analysis']:
         for j in r['C']:
             for h in range(int(r['timeslots'][j])):
                 sw, sh, _, _ = score (r,s_df_distances,j,i,h,k)
@@ -90,7 +90,7 @@ def margin(r,s_df_distances,i):
     margin_e = 0
     margin_l = 0
 
-    for k in r['Gk']:
+    for k in r['years_of_analysis']:
         for j in r['C']:
             for h in range(int(r['timeslots'][j])):
                 sw, sh, _, _ = score (r,s_df_distances,j,i,h,k)
@@ -129,7 +129,7 @@ def run_analysis(m,s,t,g,ui_inputs,s_df,backoff_factor=1):
         margin_l = 0
         year_u_avg = np.array([])
         year_v_avg = np.array([])
-        for k in r['Gk']:
+        for k in r['years_of_analysis']:
             chargertype_u_avg = np.array([])
             chargertype_v_avg = np.array([])
             for j in r['C']:

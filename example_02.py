@@ -10,7 +10,7 @@ from evci_tool.analysis import *
 
 ui_inputs = { 
     "M": ["3WS", "4WS"],
-    "years_of_analysis": 2,
+    "years_of_analysis": [1,2],
     "capex_2W": 2500,
     "capex_3WS": 112000,
     "capex_4WS": 250000,
