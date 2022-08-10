@@ -26,7 +26,7 @@ import warnings
 warnings.filterwarnings("ignore")
 
 # %% ../03_analysis.ipynb 5
-def run_episode(m,s,t,g,s_df,txt,OUTPUT_PATH,corridor):
+def run_episode(m,s,t,g,ui_inputs,s_df,txt,OUTPUT_PATH,corridor):
     "This function runs a full episode of analysis on a set of sites."
     
     print('\n' + txt.capitalize() + ' Analysis')
@@ -43,7 +43,7 @@ def run_episode(m,s,t,g,s_df,txt,OUTPUT_PATH,corridor):
 
     backoff_factor = 2 #@param {type:"slider", min:1, max:5, step:1}
 
-    u_df = run_analysis(m,s,t,g,s_df,backoff_factor=backoff_factor)
+    u_df = run_analysis(m,s,t,g,ui_inputs,s_df,backoff_factor=backoff_factor)
 
     print(f'Total capex charges = INR Cr {sum(u_df.capex)/1e7:.2f}')
     print(f'Total opex charges = INR Cr {sum(u_df.opex)/1e7:.2f}')
@@ -71,7 +71,7 @@ def run_episode(m,s,t,g,s_df,txt,OUTPUT_PATH,corridor):
     return s_u_df
 
 # %% ../03_analysis.ipynb 7
-def analyze_sites(corridor:str, cluster:bool=False, use_defaults=False):
+def analyze_sites(corridor:str, ui_inputs, cluster:bool=False, use_defaults=False):
     "The function analyzes sites specified as part of a corridor."
 
     #@title Read data from excel sheets
@@ -128,7 +128,7 @@ def analyze_sites(corridor:str, cluster:bool=False, use_defaults=False):
            data_df.loc[i].geometry
         ] 
 
-    s_u_df = run_episode(model,site,traffic,grid,s_df,'initial',OUTPUT_PATH, corridor)
+    s_u_df = run_episode(model,site,traffic,grid,ui_inputs,s_df,'initial',OUTPUT_PATH, corridor)
 
     #@title Threshold and cluster
     if cluster:
@@ -161,6 +161,6 @@ def analyze_sites(corridor:str, cluster:bool=False, use_defaults=False):
         s_df = final_list_of_sites.copy()
         s_df = s_df.reset_index(drop=True)
         
-        s_u_df = run_episode(model,site,traffic,grid,s_df,'clustered',OUTPUT_PATH, corridor)
+        s_u_df = run_episode(model,site,traffic,grid,ui_inputs,s_df,'clustered',OUTPUT_PATH, corridor)
     
     return s_u_df

@@ -8,6 +8,7 @@ __all__ = ['model_sheets', 'sites_sheets', 'traffic_sheets', 'grid_sheets', 'set
 import os
 import numpy as np
 import pandas as pd
+import json
 
 
 def setup_and_read_data(corridor:str, input_path='input/', output_path='output/'):
@@ -72,22 +73,18 @@ def data_integrity_check(m,s,t,g, verbose=False):
     return missing
 
 # %% ../00_config.ipynb 18
-def read_globals(m,s,t,g):
+def read_globals(m,s,t,g,ui_inputs):
     "This function returns all global parameters read from the xlsx."
     
     r = {}
     df_c = m['charger_specific']
     df_b = m['battery_specific']
     df_o = m['others']
-
+    
+    # read all other parameters from the xlsx
+    
     r['M'] = df_c[df_c['Parameter']=='vehicle_types']['Value'].iloc[0].split(',')
-    r['charger_types'] = r['M'] # to be set from the UI
-    r['years_of_analysis'] = max(list(map(int,df_o[df_o['Parameter']=='Analysis duration']['Value'].iloc[0].split(','))))
     r['C'] = df_c[df_c['Parameter']=='charger_types']['Value'].iloc[0].split(',')
-    r['capex_2W']  = int(df_c[df_c['Parameter']=='capex_2W']['Value'].iloc[0])
-    r['capex_3WS'] = int(df_c[df_c['Parameter']=='capex_3WS']['Value'].iloc[0])
-    r['capex_4WS'] = int(df_c[df_c['Parameter']=='capex_4WS']['Value'].iloc[0])
-    r['capex_4WF'] = int(df_c[df_c['Parameter']=='capex_4WF']['Value'].iloc[0])
     r['Kj'] = eval(df_c[df_c['Parameter']=='Kj']['Value'].iloc[0])
     r['Dj'] = eval(df_c[df_c['Parameter']=='Dj']['Value'].iloc[0])
     r['Hj'] = eval(df_c[df_c['Parameter']=='Hj']['Value'].iloc[0])
@@ -95,7 +92,6 @@ def read_globals(m,s,t,g):
     r['tj'] = eval(df_c[df_c['Parameter']=='tj']['Value'].iloc[0])
     r['Mj'] = eval(df_c[df_c['Parameter']=='Mj']['Value'].iloc[0])
     r['Gk'] = eval(df_c[df_c['Parameter']=='Gk']['Value'].iloc[0])
-    r['K'] = r['years_of_analysis']
 
     r['N'] = 500
     r['Ng'] = 0
@@ -119,28 +115,11 @@ def read_globals(m,s,t,g):
     r['Mg'] = {k: [5.5 * 0.15] * int(v) for k, v in timeslots.items()}
     r['Mr'] = {k: [0] * int(v) for k, v in timeslots.items()}
     r['l']  = {k: [1] * int(v) for k, v in timeslots.items()}
-
-    r['hoarding_cost'] = 900000 #@param {type:"slider", min:500000, max:1000000, step:50000}
-    r['kiosk_cost'] = 180000 #@param {type:"slider", min:100000, max:200000, step:20000}
-
-    r['CH'] = [r['hoarding_cost']]*Nc
-    r['CK'] = [r['kiosk_cost']]*Nc
-
+    
     r['MH'] = [s['sites'].loc[i]['Hoarding margin'] for i in range(Nc)]
     r['MK'] = [0.15]*Nc
 
     #Traffic Model
-
-    r['year1_conversion'] = float(df_o[df_o['Parameter']=='year1_conversion']['Value'].iloc[0])
-    r['year2_conversion'] = float(df_o[df_o['Parameter']=='year2_conversion']['Value'].iloc[0])
-    r['year3_conversion'] = float(df_o[df_o['Parameter']=='year3_conversion']['Value'].iloc[0])
-
-    r['pj'] = {1: r['year1_conversion'], 
-          2: r['year2_conversion'], 
-          3: r['year3_conversion']}
-
-    r['Pj'] = max(r['pj'].values()) 
-
     # peak vehicles through crowded junctions in a day ~ 1.5L
 
     peak_traffic = [
@@ -172,22 +151,49 @@ def read_globals(m,s,t,g):
     djworking['3WS'] = [np.round(i,0) for i in djworking_hourly_3WS]
     djworking['4WF'] = [np.round(i,0) for i in djworking_half_hourly]
     djworking['4WS'] = [np.round(i,0) for i in djworking_one_and_half_hourly]
-    r['djworking'] = djworking
+    r['djworking'] = djworking        
+
+    r['Cij'] = {'2W': [4]*Nc, '3WS':[1]*Nc, '4WS': [1]*Nc, '4WF':[1]*Nc}
     
-    holiday_percentage = .3 #@param {type:"slider", min:0, max:1, step:0.1}
-    r['holiday_percentage'] = holiday_percentage
+    # now override the defaults with the read values from the UI parameters into r
+    x = json.dumps(ui_inputs)
+    ui_inputs = json.loads(x)
     
+    r['K'] = ui_inputs['years_of_analysis']
+    r['charger_types'] = ui_inputs['M']
+    r['years_of_analysis'] = ui_inputs['years_of_analysis']
+    r['capex_2W']  = ui_inputs['capex_2W']
+    r['capex_3WS'] = ui_inputs['capex_3WS']
+    r['capex_4WS'] = ui_inputs['capex_4WS']
+    r['capex_4WF'] = ui_inputs['capex_4WF']
+    r['hoarding_cost'] = 900000
+    r['kiosk_cost'] = 180000
+    r['year1_conversion'] = ui_inputs['year1_conversion']
+    r['year2_conversion'] = ui_inputs['year2_conversion']
+    r['year3_conversion'] = ui_inputs['year3_conversion']
+    r['fast_charging'] = ui_inputs['fast_charging']
+    r['slow_charging'] = ui_inputs['slow_charging']
+    r['holiday_percentage'] = ui_inputs['holiday_percentage']
+    
+    # now lets derive all other parameters that depend on the UI inputs.
+    r['CH'] = [r['hoarding_cost']]*Nc
+    r['CK'] = [r['kiosk_cost']]*Nc
+    r['pj'] = {1: r['year1_conversion'], 
+          2: r['year2_conversion'], 
+          3: r['year3_conversion']}
+
+    r['Pj'] = max(r['pj'].values()) 
+
+    holiday_percentage = r['holiday_percentage']
     djholiday = {}
     djholiday['2W'] = [np.round(i*holiday_percentage,0) for i in djworking_hourly_2W]
     djholiday['3WS'] = [np.round(i*holiday_percentage,0) for i in djworking_hourly_3WS]
     djholiday['4WF'] = [np.round(i*holiday_percentage,0) for i in djworking_half_hourly]
     djholiday['4WS'] = [np.round(i*holiday_percentage,0) for i in djworking_one_and_half_hourly]
     r['djholiday'] = djholiday
-
+    
     fast_charging = float(df_o[df_o['Parameter']=='slow charger margin']['Value'].iloc[0])
     slow_charging = float(df_o[df_o['Parameter']=='fast charger margin']['Value'].iloc[0])
-    r['fast_charging'] = fast_charging
-    r['slow_charging'] = slow_charging
 
     r['qjworking'] = {'4WS': [slow_charging] * int(timeslots['4WS']), 
                  '4WF': [fast_charging] * int(timeslots['4WF']), 
@@ -197,7 +203,5 @@ def read_globals(m,s,t,g):
                  '4WF': [fast_charging] * int(timeslots['4WF']), 
                  '3WS': [fast_charging + slow_charging] * int(timeslots['3WS']), 
                  '2W' : [fast_charging + slow_charging] * int(timeslots['2W']), }
-
-    r['Cij'] = {'2W': [4]*Nc, '3WS':[1]*Nc, '4WS': [1]*Nc, '4WF':[1]*Nc}
     
     return r

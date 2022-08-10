@@ -100,10 +100,10 @@ def margin(r,s_df_distances,i):
     return margin_e + margin_l
 
 # %% ../01_model.ipynb 12
-def run_analysis(m,s,t,g,s_df,backoff_factor=1):
+def run_analysis(m,s,t,g,ui_inputs,s_df,backoff_factor=1):
     "This function runs analysis for a given set of sites."
 
-    r = read_globals(m,s,t,g)
+    r = read_globals(m,s,t,g,ui_inputs)
     
     u_df = pd.DataFrame(columns=['utilization', 
                              'unserviced', 
