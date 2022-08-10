@@ -162,3 +162,5 @@ def analyze_sites(corridor:str, cluster:bool=False, use_defaults=False):
         s_df = s_df.reset_index(drop=True)
         
         s_u_df = run_episode(model,site,traffic,grid,s_df,'clustered',OUTPUT_PATH, corridor)
+    
+    return s_u_df
