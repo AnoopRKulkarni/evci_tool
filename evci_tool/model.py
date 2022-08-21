@@ -121,8 +121,10 @@ def run_analysis(m,s,t,g,ui_inputs,s_df,backoff_factor=1):
     
     for i in tqdm(range(Nc)):
         max_vehicles = 0
-        for j in r['C']:
+        # run through selected charger types
+        for j in r['M']:
             max_vehicles += r['timeslots'][j]*r['Cij'][j][i]
+        max_vehicles = int(np.round(max_vehicles,0))
         op_e = 0
         op_l = 0
         margin_e = 0

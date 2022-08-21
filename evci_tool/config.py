@@ -84,6 +84,8 @@ def read_globals(m,s,t,g,ui_inputs):
     # read all other parameters from the xlsx
     
     r['M'] = df_c[df_c['Parameter']=='vehicle_types']['Value'].iloc[0].split(',')
+    # or should it be from the UI having selected a subset for analysis?
+    r['M'] = ui_inputs['M']
     r['C'] = df_c[df_c['Parameter']=='charger_types']['Value'].iloc[0].split(',')
     r['Kj'] = eval(df_c[df_c['Parameter']=='Kj']['Value'].iloc[0])
     r['Dj'] = eval(df_c[df_c['Parameter']=='Dj']['Value'].iloc[0])
@@ -120,6 +122,7 @@ def read_globals(m,s,t,g,ui_inputs):
     r['MK'] = [0.15]*Nc
 
     #Traffic Model
+    # read hourly vehicular traffic from the traffic.xlsx else use default values
     # peak vehicles through crowded junctions in a day ~ 1.5L
 
     peak_traffic = [
@@ -127,6 +130,13 @@ def read_globals(m,s,t,g,ui_inputs):
              6434, 6032, 6032, 6032, 6032, 6434, 6836, 7239, 8043, 
              8043, 8043, 6836, 6032, 5630, 5228       
     ]
+
+    if 'profile' in t:
+      r['peak_traffic'] = t['profile'].vehicles.tolist()[:24] 
+      peak_traffic = r['peak_traffic']
+    else:
+      printf("Using default traffic profile of around 55000 vehicles per day")
+      r['peak_traffic'] = peak_traffic
 
     # Average traffic approx 80% of peak
     avg_traffic = [i*.8 for i in peak_traffic]

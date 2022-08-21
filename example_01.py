@@ -9,6 +9,7 @@ from evci_tool.model import *
 from evci_tool.analysis import *
 
 ui_inputs = { 
+    "backoff_factor": 2,
     "M": ["3WS", "4WS"],
     "years_of_analysis": [1,2],
     "capex_2W": 2500,

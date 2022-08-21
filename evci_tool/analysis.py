@@ -41,7 +41,7 @@ def run_episode(m,s,t,g,ui_inputs,s_df,txt,OUTPUT_PATH,corridor):
 
     #@title Compute scores
 
-    backoff_factor = 2 #@param {type:"slider", min:1, max:5, step:1}
+    backoff_factor = ui_inputs['backoff_factor']
 
     u_df = run_analysis(m,s,t,g,ui_inputs,s_df,backoff_factor=backoff_factor)
 

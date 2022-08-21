@@ -9,7 +9,7 @@ from evci_tool.model import *
 from evci_tool.analysis import *
 
 ui_inputs = { 
-    "backoff_factor": 2,
+    "backoff_factor": 1,
     "M": ["3WS", "4WS"],
     "years_of_analysis": [1,2],
     "capex_2W": 2500,
@@ -28,4 +28,4 @@ ui_inputs = {
 
 # %% ../index.ipynb 7
 if __name__ == "__main__":
-    analyze_sites ('chandigarh_leh', ui_inputs, use_defaults=True)
+    analyze_sites ('mumbai_goa', ui_inputs)
