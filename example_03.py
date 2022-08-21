@@ -24,12 +24,12 @@ ui_inputs = {
     "holiday_percentage": 0.3,
     "fast_charging": 0.3,
     "slow_charging": 0.15,
-    "cluster": False,
-    "cluster_th": 0.2,
+    "cluster": True,
+    "cluster_th": 0.02,
     "plot_dendrogram": False,
-    "use_defaults": False 
+    "use_defaults": True 
 }
 
 # %% ../index.ipynb 7
 if __name__ == "__main__":
-    analyze_sites ('chandigarh_leh', ui_inputs, cluster=True, use_defaults=True)
+    analyze_sites ('chandigarh_leh', ui_inputs)

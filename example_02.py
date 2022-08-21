@@ -27,9 +27,9 @@ ui_inputs = {
     "cluster": False,
     "cluster_th": 0.2,
     "plot_dendrogram": False,
-    "use_defaults": False 
+    "use_defaults": True 
 }
 
 # %% ../index.ipynb 7
 if __name__ == "__main__":
-    analyze_sites ('chandigarh_leh', ui_inputs, use_defaults=True)
+    analyze_sites ('chandigarh_leh', ui_inputs)
