@@ -10,7 +10,7 @@ from evci_tool.analysis import *
 
 ui_inputs = { 
     "backoff_factor": 1,
-    "M": ["3WS", "4WS"],
+    "M": ["3WS", "4WS", "4WF"],
     "years_of_analysis": [1,2],
     "capex_2W": 2500,
     "capex_3WS": 112000,
@@ -24,8 +24,12 @@ ui_inputs = {
     "holiday_percentage": 0.3,
     "fast_charging": 0.3,
     "slow_charging": 0.15,
+    "cluster": False,
+    "cluster_th": 0.2,
+    "plot_dendrogram": False,
+    "use_defaults": False 
 }
 
 # %% ../index.ipynb 7
 if __name__ == "__main__":
-    analyze_sites ('mumbai_goa', ui_inputs)
+    analyze_sites ('mumbai_goa', ui_inputs, cluster=True)

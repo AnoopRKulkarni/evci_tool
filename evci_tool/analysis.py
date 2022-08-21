@@ -71,12 +71,18 @@ def run_episode(m,s,t,g,ui_inputs,s_df,txt,OUTPUT_PATH,corridor):
     return s_u_df
 
 # %% ../03_analysis.ipynb 7
-def analyze_sites(corridor:str, ui_inputs, cluster:bool=False, use_defaults=False):
+def analyze_sites(corridor:str, ui_inputs):
     "The function analyzes sites specified as part of a corridor."
 
     #@title Read data from excel sheets
     model,site,traffic,grid, INPUT_PATH, OUTPUT_PATH = setup_and_read_data(corridor)
     
+    #set variables for clustering etc from the UI
+    cluster = ui_inputs['cluster']
+    cluster_th = ui_inputs['cluster_th']
+    plot_dendrogram = ui_inputs['plot_dendrogram']
+    use_defaults = ui_inputs['use_defaults']
+
     #check if mandatory worksheets in xlsx files are available
     avail = data_availability_check(model,site,traffic,grid)
     assert len(avail) == 0, f"{avail} sheets missing from the xlsx. Please try again." 
@@ -132,13 +138,14 @@ def analyze_sites(corridor:str, ui_inputs, cluster:bool=False, use_defaults=Fals
 
     #@title Threshold and cluster
     if cluster:
-        #clustering_candidates = s_u_df[(s_u_df.utilization <= 0.2) & (s_u_df['year 1'] == 1)]
-        clustering_candidates = s_u_df[s_u_df.utilization <= 0.2]
+        #clustering_candidates = s_u_df[(s_u_df.utilization <= cluster_th) & (s_u_df['year 1'] == 1)]
+        clustering_candidates = s_u_df[s_u_df.utilization <= cluster_th]
         print('candidates for clustering: ', clustering_candidates.shape[0])
         points = np.array((clustering_candidates.apply(lambda x: list([x['Latitude'], x['Longitude']]),axis=1)).tolist())
         Z = linkage (points, method='complete', metric='euclidean');
-        #plt.figure(figsize=(14,8))
-        #dendrogram(Z);
+        if plot_dendrogram:
+            plt.figure(figsize=(14,8))
+            dendrogram(Z);
         max_d = 0.01
         clusters = fcluster(Z, t=max_d, criterion='distance')
         clustered_candidates = gpd.GeoDataFrame(clustering_candidates)
@@ -146,8 +153,8 @@ def analyze_sites(corridor:str, ui_inputs, cluster:bool=False, use_defaults=Fals
         #clustered_candidates.plot(ax=base, column=clusters, legend=True)
 
     #@title Build final list of sites
-    confirmed_sites = s_u_df[s_u_df.utilization > 0.2]
-    print('confirmed sites with utilization > 20%: ', confirmed_sites.shape[0])
+    confirmed_sites = s_u_df[s_u_df.utilization > cluster_th]
+    print(f'confirmed sites with utilization > {int(cluster_th*100)}%: {confirmed_sites.shape[0]}')
     if cluster:
         val, ind = np.unique (clusters, return_index=True)
         clustered_sites = clustered_candidates.reset_index(drop=True)

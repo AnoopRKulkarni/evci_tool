@@ -13,12 +13,6 @@ import shapely
 import os
 from tqdm import tqdm
 
-import matplotlib.pyplot as plt
-
-from scipy.cluster.vq import kmeans2, whiten
-from scipy.cluster.hierarchy import dendrogram, linkage
-from scipy.cluster.hierarchy import fcluster
-
 from .config import *
 
 import warnings
