@@ -12,7 +12,6 @@ ui_inputs = {
     "backoff_factor": 1,
     "M": ["3WS", "4WS", "4WF"],
     "years_of_analysis": [1,2,3],
-    "capex_2W": 2500,
     "capex_3WS": 112000,
     "capex_4WS": 250000,
     "capex_4WF": 1500000,

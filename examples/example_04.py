@@ -3,19 +3,15 @@
 # %% auto 0
 __all__ = []
 
-# Process all corridors listed under the 'input/' folder
-
 # %% ../index.ipynb 1
 from evci_tool.config import *
 from evci_tool.model import *
 from evci_tool.analysis import *
-import os
 
 ui_inputs = { 
     "backoff_factor": 1,
     "M": ["3WS", "4WS", "4WF"],
     "years_of_analysis": [1,2,3],
-    "capex_2W": 2500,
     "capex_3WS": 112000,
     "capex_4WS": 250000,
     "capex_4WF": 1500000,
@@ -27,17 +23,12 @@ ui_inputs = {
     "holiday_percentage": 0.3,
     "fast_charging": 0.3,
     "slow_charging": 0.15,
-    "cluster": False,
-    "cluster_th": 0.2,
+    "cluster": True,
+    "cluster_th": 0.02,
     "plot_dendrogram": False,
     "use_defaults": False 
 }
 
 # %% ../index.ipynb 7
 if __name__ == "__main__":
-    corridors = [x[0] for x in os.walk('input/')]
-    corridors.pop(0)
-    for c in corridors:
-       corridor = os.path.basename(c)
-       print(f'Processing corridor: {corridor}')
-       #analyze_sites (corridor, ui_inputs)
+    analyze_sites ('mumbai_goa', ui_inputs)
