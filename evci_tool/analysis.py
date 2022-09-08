@@ -66,7 +66,7 @@ def run_episode(m,s,t,g,ui_inputs,s_df,txt,OUTPUT_PATH,corridor):
     
     # Save output dataframe as both xlsx and json
     output_df.to_excel(OUTPUT_PATH + '/' + txt + '_evci_analysis.xlsx')
-    output_df.to_json(OUTPUT_PATH + '/' + txt + '_evci_analysis.json', orient='columns')
+    output_df.to_json(OUTPUT_PATH + '/' + txt + '_evci_analysis.json', orient='records')
     
     return s_u_df
 
@@ -99,7 +99,7 @@ def analyze_sites(corridor:str, ui_inputs):
         site['sites']['Hoarding margin'] = 270000    
     
     #@title Read required data sheets only
-    df = gpd.read_file(INPUT_PATH + '/shape_files/' + corridor + '.shp')
+    #df = gpd.read_file(INPUT_PATH + '/shape_files/' + corridor + '.shp')
 
     data = site['sites']
     data['Name'] = data['Name']

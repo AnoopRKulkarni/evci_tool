@@ -140,30 +140,26 @@ def read_globals(m,s,t,g,ui_inputs):
 
     # Average traffic approx 80% of peak
     avg_traffic = [i*.8 for i in peak_traffic]
-    # 2W and 4W assumed to be 60% and 20% respectively
-    avg_traffic_2W = [i*.6 for i in avg_traffic]
+    
     avg_traffic_3W = [i*.4 for i in avg_traffic]
     avg_traffic_4W = [i*.2 for i in avg_traffic]
-    djworking_hourly_2W = [i/5 for i in avg_traffic_2W]
-    djworking_hourly_3WS = djworking_hourly_2W
+  
+    djworking_hourly_3WS = [i/5 for i in avg_traffic_3W]
     djworking_hourly = [i/5 for i in avg_traffic_4W]
     djworking_half_hourly = [val for val in djworking_hourly 
                              for _ in (0, 1)]
     djworking_one_and_half_hourly = list(np.mean(np.array(djworking_half_hourly).reshape(-1, 3), axis=1))
-    r['djworking_hourly_2W'] = djworking_hourly_2W
-    r['djworking_hourly_3WS'] = djworking_hourly_2W
     r['djworking_hourly'] = djworking_hourly
     r['djworking_half_hourly'] = djworking_half_hourly
     r['djworking_one_and_half_hourly'] = djworking_one_and_half_hourly
     
     djworking = {}
-    djworking['2W'] = [np.round(i,0) for i in djworking_hourly_2W]
     djworking['3WS'] = [np.round(i,0) for i in djworking_hourly_3WS]
     djworking['4WF'] = [np.round(i,0) for i in djworking_half_hourly]
     djworking['4WS'] = [np.round(i,0) for i in djworking_one_and_half_hourly]
     r['djworking'] = djworking        
 
-    r['Cij'] = {'2W': [4]*Nc, '3WS':[1]*Nc, '4WS': [1]*Nc, '4WF':[1]*Nc}
+    r['Cij'] = {'3WS':[1]*Nc, '4WS': [1]*Nc, '4WF':[1]*Nc}
     
     # now override the defaults with the read values from the UI parameters into r
     x = json.dumps(ui_inputs)
@@ -172,7 +168,6 @@ def read_globals(m,s,t,g,ui_inputs):
     r['K'] = ui_inputs['years_of_analysis']
     r['charger_types'] = ui_inputs['M']
     r['years_of_analysis'] = ui_inputs['years_of_analysis']
-    r['capex_2W']  = ui_inputs['capex_2W']
     r['capex_3WS'] = ui_inputs['capex_3WS']
     r['capex_4WS'] = ui_inputs['capex_4WS']
     r['capex_4WF'] = ui_inputs['capex_4WF']
@@ -196,7 +191,6 @@ def read_globals(m,s,t,g,ui_inputs):
 
     holiday_percentage = r['holiday_percentage']
     djholiday = {}
-    djholiday['2W'] = [np.round(i*holiday_percentage,0) for i in djworking_hourly_2W]
     djholiday['3WS'] = [np.round(i*holiday_percentage,0) for i in djworking_hourly_3WS]
     djholiday['4WF'] = [np.round(i*holiday_percentage,0) for i in djworking_half_hourly]
     djholiday['4WS'] = [np.round(i*holiday_percentage,0) for i in djworking_one_and_half_hourly]
@@ -208,10 +202,10 @@ def read_globals(m,s,t,g,ui_inputs):
     r['qjworking'] = {'4WS': [slow_charging] * int(timeslots['4WS']), 
                  '4WF': [fast_charging] * int(timeslots['4WF']), 
                  '3WS': [fast_charging + slow_charging] * int(timeslots['3WS']), 
-                 '2W' : [fast_charging + slow_charging] * int(timeslots['2W']), }
+                  }
     r['qjholiday'] = {'4WS': [slow_charging] * int(timeslots['4WS']), 
                  '4WF': [fast_charging] * int(timeslots['4WF']), 
                  '3WS': [fast_charging + slow_charging] * int(timeslots['3WS']), 
-                 '2W' : [fast_charging + slow_charging] * int(timeslots['2W']), }
+                 }
     
     return r
