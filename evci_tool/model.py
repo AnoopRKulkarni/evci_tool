@@ -25,7 +25,7 @@ def score(r,s_df_distances,j,i,hj,k,backoff=True, backoff_factor=1):
     distance_from_i = s_df_distances[s_df_distances > 0][i].sort_values()/1e3
     closer_to_i = distance_from_i[distance_from_i <= 5.0]
     try:
-        congestion = float(s_df.loc[i]['Traffic congestion'])
+        congestion = float(s_df_distances.loc[i]['Traffic congestion'])
     except:
         congestion = 1.0
 
@@ -50,8 +50,11 @@ def score(r,s_df_distances,j,i,hj,k,backoff=True, backoff_factor=1):
     if (th > r['tj'][j]): vh = (th - r['tj'][j]) * (r['Cij'][j][i]/r['tj'][j])
 
     norm_uw, norm_uh = uw/r['tj'][j], uh/r['tj'][j]
-    norm_vw = vw/nw
-    norm_vh = vh/nh
+    
+    if nw>0: norm_vw = vw/nw
+    else: norm_vw = 0
+    if nh>0: norm_vh = vh/nh
+    else: norm_vh = 0
 
     return norm_uw, norm_uh, norm_vw, norm_vh
 
@@ -110,6 +113,8 @@ def run_analysis(m,s,t,g,ui_inputs,s_df,backoff_factor=1):
     s_df_crs = gpd.GeoDataFrame(s_df, crs='EPSG:4326')
     s_df_crs = s_df_crs.to_crs('EPSG:5234')
     s_df_distances = s_df_crs.geometry.apply(lambda g: s_df_crs.distance(g))      
+    
+    s_df_distances['Traffic congestion'] = s['sites']['Traffic congestion']
     
     Nc = s_df.shape[0]
     

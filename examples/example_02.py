@@ -26,7 +26,7 @@ ui_inputs = {
     "cluster": False,
     "cluster_th": 0.2,
     "plot_dendrogram": False,
-    "use_defaults": True 
+    "use_defaults": False 
 }
 
 # %% ../index.ipynb 7
